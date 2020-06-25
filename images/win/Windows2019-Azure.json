@@ -5,7 +5,7 @@
         "subscription_id": "{{env `ARM_SUBSCRIPTION_ID`}}",
         "tenant_id": "{{env `ARM_TENANT_ID`}}",
         "object_id": "{{env `ARM_OBJECT_ID`}}",
-        "resource_group": "{{env `ARM_RESOURCE_GROUP`}}",
+        "gallery_name": "{{env `gallery_name'}}",
         "storage_account": "{{env `ARM_STORAGE_ACCOUNT`}}",
         "temp_resource_group_name": "{{env `TEMP_RESOURCE_GROUP_NAME`}}",
         "location": "{{env `ARM_RESOURCE_LOCATION`}}",
@@ -16,7 +16,7 @@
         "private_virtual_network_with_public_ip": "{{env `PRIVATE_VIRTUAL_NETWORK_WITH_PUBLIC_IP`}}",
         "vm_size": "Standard_D4_v2",
         "run_scan_antivirus": "false",
-
+        "{{user `resource_group`}}"
         "root_folder": "C:",
         "toolset_json_path": "{{env `TEMP`}}\\toolset.json",
         "image_folder": "C:\\image",
@@ -29,13 +29,15 @@
         "install_password": null,
         "capture_name_prefix": "packer",
         "image_version": "dev",
+        "image_name": "dev",
         "image_os": "win19",
+        "replication_region": "",  "",  ""
         "github_feed_token": "{{env `GITHUB_FEED_TOKEN`}}"
     },
     "sensitive-variables": ["install_password", "ssh_password", "client_secret", "github_feed_token"],
     "builders": [
         {
-            "name": "vhd",
+            "name": "Managed Image",
             "type": "azure-arm",
             "client_id": "{{user `client_id`}}",
             "client_secret": "{{user `client_secret`}}",
@@ -45,8 +47,8 @@
             "os_disk_size_gb": "256",
             "location": "{{user `location`}}",
             "vm_size": "{{user `vm_size`}}",
-            "resource_group_name": "{{user `resource_group`}}",
-            "storage_account": "{{user `storage_account`}}",
+            "managed_image_resource_group_name": "{{user `resource_group`}}",
+            "managed_image_name": "images-{{isotime \"200601020304\"}}",
             "temp_resource_group_name": "{{user `temp_resource_group_name`}}",
             "capture_container_name": "images",
             "capture_name_prefix": "{{user `capture_name_prefix`}}",
@@ -61,7 +63,16 @@
             "communicator": "winrm",
             "winrm_use_ssl": "true",
             "winrm_insecure": "true",
-            "winrm_username": "packer"
+            "winrm_username": "packer",
+             "shared_image_gallery_destination": {
+                "resource_group": "RSG-AzureDevOpsBuildServices-PROD",
+                "gallery_name": "{{{user `gallery_name'}}",,
+                "image_name": "{{user `image_name`}}",
+                "image_version": "1.0.0",
+                "replication_regions": [
+                    "{{user `replication_region`}}"
+                ]
+            }
         }
     ],
     "provisioners": [
